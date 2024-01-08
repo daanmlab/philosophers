@@ -8,7 +8,9 @@ SRC_DIR = ./src
 OBJ_DIR = ./obj
 
 
-SRC_FILES =  $(SRC_DIR)/main.c
+SRC_FILES =  	$(SRC_DIR)/main.c \
+				$(SRC_DIR)/utils.c \
+				$(SRC_DIR)/setup.c
 
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
@@ -32,7 +34,6 @@ test: $(NAME)
 	valgrind --leak-check=full ./$(NAME)
 
 clean:
-	@make -C $(LIBFT_DIR) clean
 	@rm -f $(OBJS)
 	@if [ -d "$(OBJ_DIR)" ]; then 		rm -rf $(OBJ_DIR); 	fi
 
