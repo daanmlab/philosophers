@@ -6,7 +6,7 @@
 /*   By: dabalm <dabalm@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/07 23:58:08 by dabalm            #+#    #+#             */
-/*   Updated: 2024/01/07 23:59:57 by dabalm           ###   ########.fr       */
+/*   Updated: 2024/01/09 14:21:19 by dabalm           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,9 @@ void	print(t_philo *philo, char *str)
 	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
-	if (philo->data->dead)
-		return ;
 	pthread_mutex_lock(&philo->data->print);
-	printf("%ld:%ld %d %s\n", tv.tv_sec, tv.tv_usec, philo->id, str);
+	if (!philo->data->dead)
+		printf("%ld %d %s\n", (tv.tv_sec * 1000 + tv.tv_usec / 1000), philo->id, str);
 	pthread_mutex_unlock(&philo->data->print);
 }
 
@@ -70,4 +69,20 @@ int	get_time(struct timeval last_meal)
 	res = (tv.tv_sec - last_meal.tv_sec) * 1000;
 	res += (tv.tv_usec - last_meal.tv_usec) / 1000;
 	return (res);
+}
+
+void end(t_data *data)
+{
+    int	i;
+
+    i = 0;
+    while (i < data->nb_philo)
+    {
+        pthread_mutex_destroy(&data->forks[i]);
+        i++;
+    }
+    pthread_mutex_destroy(&data->print);
+    free(data->forks);
+    free(data->philo);
+    exit(0);
 }

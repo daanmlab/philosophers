@@ -6,11 +6,25 @@
 /*   By: dabalm <dabalm@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 00:01:10 by dabalm            #+#    #+#             */
-/*   Updated: 2024/01/08 00:05:20 by dabalm           ###   ########.fr       */
+/*   Updated: 2024/01/09 13:59:56 by dabalm           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+int all_done(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (i < data->nb_philo)
+	{
+		if (data->philo[i].done == 0)
+			return (0);
+		i++;
+	}
+	return (1);
+}
 
 void	*observer(void *d)
 {
@@ -29,8 +43,13 @@ void	*observer(void *d)
 		if (get_time(data->philo[i].last_meal) > data->time_to_die)
 		{
 			print(&data->philo[i], "died");
+			data->philo[i].done = 1;
 			data->dead = 1;
-			exit(0);
+		}
+		if (all_done(data))
+		{
+			// printf("All done\n");
+			return (NULL);
 		}
 		if (++i == data->nb_philo)
 		{
@@ -54,6 +73,7 @@ int	create_philos(t_data *data)
 
 	i = 0;
 	data->philo = malloc(sizeof(t_philo) * data->nb_philo);
+	data->dead = 0;
 	if (!data->philo)
 		return (0);
 	while (i < data->nb_philo)
