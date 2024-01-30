@@ -10,7 +10,11 @@ OBJ_DIR = ./obj
 
 SRC_FILES =  	$(SRC_DIR)/main.c \
 				$(SRC_DIR)/utils.c \
-				$(SRC_DIR)/setup.c
+				$(SRC_DIR)/philo.c \
+				$(SRC_DIR)/philo2.c \
+				$(SRC_DIR)/routines.c \
+				$(SRC_DIR)/observer.c
+
 
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
 

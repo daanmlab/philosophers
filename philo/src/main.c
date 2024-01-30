@@ -5,116 +5,63 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dabalm <dabalm@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/07 21:06:14 by dabalm            #+#    #+#             */
-/*   Updated: 2024/01/09 14:18:14 by dabalm           ###   ########.fr       */
+/*   Created: 2024/01/23 14:43:49 by dabalm            #+#    #+#             */
+/*   Updated: 2024/01/30 19:42:47 by dabalm           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	*routine(void *arg)
+void	init_mutexes(t_main *main)
 {
-	t_philo	*philo;
+	int	i;
 
-	philo = (t_philo *)arg;
-	gettimeofday(&philo->last_meal, NULL);
-	while (1)
-	{
-		print(philo, "is thinking");
-		if (philo->data->nb_philo == 1)
-		{
-			print(philo, "died");
-			philo->done = 1;
-			philo->data->dead = 1;
-			return (NULL);
-		}
-		pthread_mutex_lock(&philo->data->forks[philo->id - 1]);
-		// print(philo, "has taken a fork");
-		pthread_mutex_lock(&philo->data->forks[philo->id
-			% philo->data->nb_philo]);
-		// print(philo, "has taken a fork");
-		if (philo->data->dead)
-		{
-			pthread_mutex_unlock(&philo->data->forks[philo->id - 1]);
-			pthread_mutex_unlock(&philo->data->forks[philo->id
-				% philo->data->nb_philo]);
-			philo->done = 1;
-			return (NULL);
-		}
-		print(philo, "is eating");
-		usleep(philo->data->time_to_eat);
-		philo->nb_meal++;
-		pthread_mutex_unlock(&philo->data->forks[philo->id - 1]);
-		pthread_mutex_unlock(&philo->data->forks[philo->id
-			% philo->data->nb_philo]);
-		if ((philo->data->nb_eat != -1 && philo->nb_meal == philo->data->nb_eat) || (philo->data->dead))
-		{
-			philo->done = 1;
-			return (NULL);
-		}
-		print(philo, "is sleeping");
-		usleep(philo->data->time_to_sleep);
-	}
+	i = 0;
+	while (i < main->nb_philo)
+		pthread_mutex_init(&main->forks[i++], NULL);
+	pthread_mutex_init(&main->write, NULL);
+}
+
+void	init_main(t_main *main, int argc, char **argv)
+{
+	main->nb_philo = ft_atoi(argv[1]);
+	main->time_to_die = ft_atoi(argv[2]);
+	main->time_to_eat = ft_atoi(argv[3]);
+	main->time_to_sleep = ft_atoi(argv[4]);
+	if (argc == 6)
+		main->nb_meals = ft_atoi(argv[5]);
+	else
+		main->nb_meals = -1;
+	main->start_time = get_time();
+	main->forks = malloc(sizeof(pthread_mutex_t) * main->nb_philo);
+	main->first_philo = init_philos(main);
+	main->dead = 0;
+}
+
+void	*destroy_main(t_main *main)
+{
+	int	i;
+
+	i = 0;
+	while (i < main->nb_philo)
+		pthread_mutex_destroy(&main->forks[i++]);
+	free(main->forks);
+	pthread_mutex_destroy(&main->write);
 	return (NULL);
-}
-
-void	start(t_data *data)
-{
-	int	i;
-
-	i = 0;
-	while (i < data->nb_philo)
-	{
-		data->philo[i].id = i + 1;
-		data->philo[i].data = data;
-		if (pthread_create(&data->philo[i].thread, NULL, &routine,
-				&data->philo[i]))
-			return ;
-		i++;
-	}
-}
-
-void	join_philos(t_data *data)
-{
-	int	i;
-
-	i = 0;
-	while (i < data->nb_philo)
-	{
-		if (pthread_join(data->philo[i].thread, NULL))
-			return ;
-		i++;
-	}
 }
 
 int	main(int argc, char **argv)
 {
-	t_data	data;
-	int		i;
+	struct s_main	main;
 
-	i = 0;
-	if (!check_args(argc, argv))
-	{
-		printf("Error: bad arguments\n");
-		return (0);
-	}
-	if (!setup(&data, argc, argv))
-	{
-		printf("Error: setup failed\n");
-		return (0);
-	}
-	while (i < data.nb_philo)
-		data.philo[i++].last_meal = (struct timeval){0, 0};
-	while (i < data.nb_philo)
-		data.philo[i++].data = &data;
-	if (!setup_dead_observer(&data))
-	{
-		printf("Error: setup failed\n");
-		return (0);
-	}
-	start(&data);
-	join_philos(&data);
-	pthread_join(data.observer, NULL);
-	end(&data);
+	if ((argc < 5 || argc > 6) && printf("Wrong number of arguments\n"))
+		return (1);
+	init_main(&main, argc, argv);
+	init_mutexes(&main);
+	start_routines(&main);
+	observe(&main);
+	join_routines(&main);
+	free_philos(main.first_philo);
+	destroy_main(&main);
 	return (0);
 }

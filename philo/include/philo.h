@@ -6,7 +6,7 @@
 /*   By: dabalm <dabalm@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 18:46:30 by dabalm            #+#    #+#             */
-/*   Updated: 2024/01/08 15:05:32 by dabalm           ###   ########.fr       */
+/*   Updated: 2024/01/30 20:02:29 by dabalm           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,42 +18,55 @@
 # include <sys/time.h>
 # include <unistd.h>
 
-typedef struct s_data	t_data;
+typedef unsigned long long	t_ull;
+
+typedef struct s_philo		t_philo;
+
+typedef struct s_main
+{
+	int						nb_philo;
+	int						nb_meals;
+	t_ull					time_to_die;
+	t_ull					time_to_eat;
+	t_ull					time_to_sleep;
+	t_ull					start_time;
+	int						dead;
+	pthread_mutex_t			write;
+	pthread_mutex_t			*forks;
+	t_philo					*first_philo;
+}							t_main;
 
 typedef struct s_philo
 {
-	int					id;
-	pthread_t			thread;
-	struct timeval		last_meal;
-	int					nb_meal;
-	t_data				*data;
-	int					start;
-	int 				done;
-}						t_philo;
+	int						id;
+	int						dead;
+	int						meals_eaten;
+	pthread_mutex_t			*left_fork;
+	pthread_mutex_t			*right_fork;
+	t_ull					last_meal;
+	pthread_t				thread;
+	t_philo					*next;
+	t_main					*main;
+}							t_philo;
 
-typedef struct s_data
-{
-	int					nb_philo;
-	int					time_to_die;
-	int					time_to_eat;
-	int					time_to_sleep;
-	int					nb_eat;
-	int					dead;
-	pthread_mutex_t		*forks;
-	pthread_mutex_t		print;
-	pthread_t			observer;
-	t_philo				*philo;
-}						t_data;
+// utils.c
+t_ull						get_time(void);
+void						print_status(t_philo *philo, char *status,
+								int *dead);
+int							ft_atoi(const char *str);
+void						_usleep(t_ull time);
 
-int						ft_atoi(char *str);
-void					print(t_philo *philo, char *str);
-int						check_args(int argc, char **argv);
-int						get_time(struct timeval last_meal);
+// routines.c
+void						start_routines(t_main *main);
+void						*join_routines(t_main *main);
 
-int						setup_dead_observer(t_data *data);
-void					*observer(void *d);
-int						create_philos(t_data *data);
-int						setup(t_data *data, int argc, char **argv);
-void end(t_data *data);
+// philo.c
+t_philo						*init_philos(t_main *main);
+void						*philo_routine(void *arg);
+t_philo						*free_philos(t_philo *philos);
+t_philo						*create_philo(t_main *main, int id);
+
+// observer.c
+void						*observe(t_main *main);
 
 #endif
