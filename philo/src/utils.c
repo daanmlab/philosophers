@@ -6,14 +6,13 @@
 /*   By: dabalm <dabalm@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/24 16:48:16 by dabalm            #+#    #+#             */
-/*   Updated: 2024/02/02 15:20:02 by dabalm           ###   ########.fr       */
+/*   Updated: 2024/02/02 15:47:52 by dabalm           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-
-int is_valid_number(char *str)
+int	is_valid_number(char *str)
 {
 	int	i;
 
