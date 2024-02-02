@@ -6,7 +6,7 @@
 /*   By: dabalm <dabalm@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/24 17:01:12 by dabalm            #+#    #+#             */
-/*   Updated: 2024/01/30 20:03:41 by dabalm           ###   ########.fr       */
+/*   Updated: 2024/02/02 15:35:05 by dabalm           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ void	*observe(t_main *main)
 		pthread_mutex_unlock(&main->write);
 		philo = philo->next;
 	}
-	if (died)
-		printf("%llu %d dead\n", get_time() - philo->main->start_time, philo->id
+	if (died && (philo->meals_eaten < main->nb_meals))
+		printf("%llu %d died\n", get_time() - philo->main->start_time, philo->id
 			+ 1);
 	while (!all_dead(main))
 		;

@@ -6,11 +6,26 @@
 /*   By: dabalm <dabalm@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/24 16:48:16 by dabalm            #+#    #+#             */
-/*   Updated: 2024/01/30 20:04:09 by dabalm           ###   ########.fr       */
+/*   Updated: 2024/02/02 15:20:02 by dabalm           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+
+int is_valid_number(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] < '0' || str[i] > '9')
+			return (0);
+		i++;
+	}
+	return (1);
+}
 
 t_ull	get_time(void)
 {

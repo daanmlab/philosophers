@@ -1,7 +1,6 @@
-# Sample Makefile
 CC = cc
 CFLAGS = -g -Wall -Wextra -Werror -I$(INCLUDE_DIR)
-NAME = philosophers
+NAME = philo
 
 INCLUDE_DIR = ./include
 SRC_DIR = ./src
@@ -21,7 +20,7 @@ OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
 all: $(NAME)
 
 $(NAME): $(OBJ_FILES)
-	$(CC) $^ -o $@ $(LIBFT) -lreadline
+	$(CC) $^ -o $@ $(LIBFT)
 
 # Make sure dir exists
 $(OBJ_FILES): | $(OBJ_DIR)

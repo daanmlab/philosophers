@@ -6,7 +6,7 @@
 /*   By: dabalm <dabalm@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 18:46:30 by dabalm            #+#    #+#             */
-/*   Updated: 2024/01/30 20:02:29 by dabalm           ###   ########.fr       */
+/*   Updated: 2024/02/02 15:20:19 by dabalm           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ void						print_status(t_philo *philo, char *status,
 								int *dead);
 int							ft_atoi(const char *str);
 void						_usleep(t_ull time);
+int 						is_valid_number(char *str);
 
 // routines.c
 void						start_routines(t_main *main);
