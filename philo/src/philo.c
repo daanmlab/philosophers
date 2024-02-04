@@ -6,7 +6,7 @@
 /*   By: dabalm <dabalm@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/24 16:58:28 by dabalm            #+#    #+#             */
-/*   Updated: 2024/01/30 20:01:57 by dabalm           ###   ########.fr       */
+/*   Updated: 2024/02/04 02:08:50 by dabalm           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,9 @@ int	eat(t_philo *philo, int *dead)
 	if (*dead)
 		return (0);
 	print_status(philo, "is eating", dead);
+	pthread_mutex_lock(&philo->main->write);
 	philo->last_meal = get_time();
+	pthread_mutex_unlock(&philo->main->write);
 	_usleep(philo->main->time_to_eat);
 	unlock_forks(philo->left_fork, philo->right_fork);
 	philo->meals_eaten++;
@@ -94,6 +96,18 @@ int	eat(t_philo *philo, int *dead)
 			&& philo->meals_eaten >= philo->main->nb_meals) || *dead)
 		return (0);
 	return (1);
+}
+
+int is_dead(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->main->write);
+	if (philo->main->dead)
+	{
+		pthread_mutex_unlock(&philo->main->write);
+		return (1);
+	}
+	pthread_mutex_unlock(&philo->main->write);
+	return (0);
 }
 
 void	*philo_routine(void *arg)
@@ -105,16 +119,15 @@ void	*philo_routine(void *arg)
 	philo = (t_philo *)arg;
 	while (!philo->dead)
 	{
-		if (philo->main->dead)
+		if (is_dead(philo))
 			break ;
 		if (!eat(philo, &dead))
 			break ;
 		print_status(philo, "is sleeping", &dead);
 		_usleep(philo->main->time_to_sleep);
-		if (philo->main->dead)
+		if (is_dead(philo))
 			break ;
 		print_status(philo, "is thinking", &dead);
 	}
-	philo->dead = 1;
 	return (NULL);
 }
